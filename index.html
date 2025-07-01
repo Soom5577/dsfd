@@ -1,0 +1,296 @@
+<!-- الكود كاملاً تم تحديثه ليدعم:
+- التحقق من قوة كلمة المرور
+- قائمة للمحافظات
+- اختيار رمز الدولة لرقم الهاتف -->
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zarʿa Platform</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Tahoma', sans-serif;
+      background: url(img/3a37a7b92527c320ad03966084a55267.jpg);
+      background-repeat: no-repeat;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+    }
+    .centered, .popup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 1rem;
+    }
+    h1 {
+        color: white;
+        text-shadow: 0px 0px 10px red;
+    }
+    .btn {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    .popup {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: auto;
+      display: none;
+    }
+    .form-section {
+      display: none;
+      padding: 2rem;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .error {
+      color: red;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .dashboard, .consumer-dashboard {
+      display: none;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body id="body">
+  <div class="centered" id="welcomeScreen">
+    <h1>مرحبًا بك في Zarʿa</h1>
+    <button class="btn" onclick="showPopup()">ابدأ الآن</button>
+  </div>
+
+  <div class="popup" id="userTypePopup" style="background: url(img/3a37a7b92527c320ad03966084a55267.jpg);background-size: cover;">
+    <h2 style="color: black;">انضم إلى Zarʿa كـ:</h2>
+    <button class="btn" onclick="showFarmerForm()">مزارع</button>
+    <button class="btn" onclick="showConsumerForm()">مستهلك</button>
+  </div>
+
+  <form class="form-section" id="farmerStep1">
+    <h2 style="color: white;">بيانات المزرعة</h2>
+    <div class="form-group"><input id="farmName" type="text" placeholder="اسم المزرعة" required></div>
+    <div class="form-group"><input id="managerName" type="text" placeholder="اسم المسؤول" required></div>
+    <div class="form-group">
+      <input id="email" type="email" placeholder="البريد الإلكتروني" required>
+      <div class="error" id="emailError">يرجى إدخال بريد إلكتروني صالح</div>
+    </div>
+    <div class="form-group">
+      <input id="password" type="password" placeholder="كلمة المرور (8 أحرف على الأقل)" required>
+      <div class="error" id="passwordError">كلمة المرور يجب أن تكون قوية (8 أحرف أو أكثر)</div>
+    </div>
+    <div class="form-group"><input type="password" placeholder="تأكيد كلمة المرور" required></div>
+    <div class="form-group">
+      <select id="countryCode">
+        <option value="968">+968 عمان</option>
+        <option value="966">+966 السعودية</option>
+        <option value="971">+971 الإمارات</option>
+        <option value="965">+965 الكويت</option>
+      </select>
+      <input id="phone" type="tel" placeholder="رقم الجوال" required>
+      <div class="error" id="phoneError">يرجى إدخال رقم هاتف صالح (10 أرقام)</div>
+    </div>
+    <div class="form-group">
+      <select id="region" required>
+        <option disabled selected>اختر المحافظة</option>
+        <option value="الظاهرة">الظاهرة</option>
+        <option value="الداخلية">الداخلية</option>
+        <option value="الباطنة">الباطنة</option>
+        <option value="الشرقية">الشرقية</option>
+        <option value="الوسطى">الوسطى</option>
+        <option value="ظفار">ظفار</option>
+      </select>
+    </div>
+    <div class="form-group"><input type="text" placeholder="السجل التجاري" required></div>
+    <div class="form-group"><input type="text" placeholder="رقم الترخيص الزراعي" required></div>
+    <button class="btn" type="button" onclick="validateFarmerStep1()">التالي</button>
+  </form>
+
+  <form class="form-section" id="consumerForm">
+    <h2 style="color: white;">تسجيل المستهلك</h2>
+    <div class="form-group"><input id="consumerName" type="text" placeholder="الاسم الكامل" required></div>
+    <div class="form-group">
+      <input id="consumerEmail" type="email" placeholder="البريد الإلكتروني" required>
+      <div class="error" id="consumerEmailError">يرجى إدخال بريد إلكتروني صالح</div>
+    </div>
+    <div class="form-group">
+      <input id="consumerPassword" type="password" placeholder="كلمة المرور (8 أحرف على الأقل)" required>
+      <div class="error" id="consumerPasswordError">كلمة المرور يجب أن تكون قوية (8 أحرف أو أكثر)</div>
+    </div>
+    <div class="form-group">
+      <select id="consumerCountry">
+        <option value="968">+968 عمان</option>
+        <option value="966">+966 السعودية</option>
+        <option value="971">+971 الإمارات</option>
+        <option value="965">+965 الكويت</option>
+      </select>
+      <input id="consumerPhone" type="tel" placeholder="رقم الجوال" required>
+      <div class="error" id="consumerPhoneError">يرجى إدخال رقم هاتف صالح (8     أرقام)</div>
+    </div>
+    <div class="form-group">
+      <select id="consumerRegion" required>
+        <option disabled selected>اختر المحافظة</option>
+        <option value="الظاهرة">الظاهرة</option>
+        <option value="الداخلية">الداخلية</option>
+        <option value="الباطنة">الباطنة</option>
+        <option value="الشرقية">الشرقية</option>
+        <option value="الوسطى">الوسطى</option>
+        <option value="ظفار">ظفار</option>
+      </select>
+    </div>
+    <div class="form-group"><textarea placeholder="عنوان التوصيل"></textarea></div>
+    <button class="btn" type="button" onclick="validateConsumerForm()">إنشاء حساب</button>
+  </form>
+
+     <!-- بعد نجاح تسجيل المستهلك -->
+<div class="consumer-dashboard" id="consumerDashboard" style="background: url(img/b1dac0470bdf2f7cc0c559599fba19f9.jpg);background-size: cover;">
+  <h2>مرحبًا بك في منصة Zarʿa</h2>
+
+  <!-- شريط البحث -->
+  <input type="text" placeholder="ابحث عن منتج أو مزرعة" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem;">
+
+  <!-- فئات سريعة -->
+  <div style="margin-bottom: 1rem;">
+    <button class="btn">خضار</button>
+    <button class="btn">فواكه</button>
+    <button class="btn">عضوي</button>
+  </div>
+
+  <!-- عربة التسوق -->
+  <div style="margin-bottom: 1rem;">
+    <h3>🛒 عربة التسوق</h3>
+    <p>لم تقم بإضافة أي منتجات بعد.</p>
+  </div>
+
+  <!-- الطلبات السابقة -->
+  <div style="margin-bottom: 1rem;">
+    <h3>📦 طلباتك السابقة</h3>
+    <p>لا توجد طلبات حالياً.</p>
+  </div>
+
+  <!-- تتبع الطلب -->
+  <div style="margin-bottom: 1rem;">
+    <h3>🚚 تتبع الطلب</h3>
+    <p>يمكنك تتبع حالة الطلب هنا بعد الشراء.</p>
+  </div>
+
+  <!-- التقييم وكتابة رأي -->
+  <div>
+    <h3>⭐ التقييم وكتابة رأي</h3>
+    <textarea placeholder="اكتب رأيك هنا..." style="width: 100%; height: 100px; margin-bottom: 0.5rem;"></textarea>
+    <button class="btn">إرسال</button>
+  </div>
+</div>
+
+  <script>
+    function showPopup() {
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('userTypePopup').style.display = 'flex';
+    }
+
+    function showFarmerForm() {
+      document.getElementById('userTypePopup').style.display = 'none';
+      document.getElementById('farmerStep1').style.display = 'block';
+    }
+
+    function validateFarmerStep1() {
+      const email = document.getElementById('email');
+      const phone = document.getElementById('phone');
+      const password = document.getElementById('password');
+      let valid = true;
+
+      
+
+      if (valid) {
+        alert("تم التحقق من البيانات - يمكنك المتابعة للخطوة الثانية");
+      }
+    }
+    function showConsumerForm() {
+      document.getElementById('userTypePopup').style.display = 'none';
+      document.getElementById('consumerForm').style.display = 'block';
+    }
+
+    function validateConsumerForm() {
+      const email = document.getElementById('consumerEmail');
+      const phone = document.getElementById('consumerPhone');
+      const password = document.getElementById('consumerPassword');
+      let valid = true;
+
+      if (!email.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        document.getElementById('consumerEmailError').style.display = 'block';
+        valid = false;
+      } else {
+        document.getElementById('consumerEmailError').style.display = 'none';
+      }
+
+      if (!password.value || password.value.length < 8) {
+        document.getElementById('consumerPasswordError').style.display = 'block';
+        valid = false;
+      } else {
+        document.getElementById('consumerPasswordError').style.display = 'none';
+      }
+
+      if (!phone.value.match(/^\d{8,10}$/)) {
+        document.getElementById('consumerPhoneError').style.display = 'block';
+        valid = false;
+      } else {
+        document.getElementById('consumerPhoneError').style.display = 'none';
+      }
+
+      if (valid) {
+        alert("تم تسجيل حساب المستهلك بنجاح");
+      }
+    }
+    function validateConsumerForm() {
+    const email = document.getElementById('consumerEmail');
+    const phone = document.getElementById('consumerPhone');
+    const password = document.getElementById('consumerPassword');
+    let valid = true;
+
+    if (!email.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      document.getElementById('consumerEmailError').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('consumerEmailError').style.display = 'none';
+    }
+
+    if (!password.value || password.value.length < 8) {
+      document.getElementById('consumerPasswordError').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('consumerPasswordError').style.display = 'none';
+    }
+
+    if (!phone.value.match(/^\d{8,10}$/)) {
+      document.getElementById('consumerPhoneError').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('consumerPhoneError').style.display = 'none';
+    }
+
+    if (valid) {
+      document.getElementById('consumerForm').style.display = 'none';
+      document.getElementById('consumerDashboard').style.display = 'block';
+    }
+  }
+  </script>
+</body>
+</html>
